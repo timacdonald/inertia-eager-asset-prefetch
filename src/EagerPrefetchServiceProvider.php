@@ -3,9 +3,9 @@
 namespace TiMacDonald\Inertia;
 
 use Illuminate\Foundation\Vite;
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class EagerPrefetchServiceProvider extends BaseServiceProvider
+class EagerPrefetchServiceProvider extends ServiceProvider
 {
     public array $singletons = [
         Vite::class => EagerPrefetch::class,
