@@ -27,6 +27,13 @@ class ServiceProvider extends BaseServiceProvider
             protected $prefetchChunks = 3;
 
             /**
+             * Filter the prefetch assets.
+             *
+             * @param  callable|null
+             */
+            protected $prefetchFilter = null;
+
+            /**
              * Set the prefetching strategy.
              *
              * @param  'waterfall'|'aggressive'  $strategy
@@ -39,6 +46,16 @@ class ServiceProvider extends BaseServiceProvider
                 if ($strategy === 'waterfall') {
                     $this->prefetchChunks = $extra[0] ?? 3;
                 }
+
+                return $this;
+            }
+
+            /**
+             * Filter the assets to prefetch use the given callback.
+             */
+            public function usePrefetchFilter(callable $callback): static
+            {
+                $this->prefetchFilter = $callback;
 
                 return $this;
             }
@@ -80,8 +97,8 @@ class ServiceProvider extends BaseServiceProvider
                         ->values()
                         ->pipe(fn ($attributes) => Js::from($attributes)->toHtml());
 
-                if ($this->prefetchStrategy === 'waterfall') {
-                    return new HtmlString($html.<<<HTML
+                return match ($this->prefetchStrategy) {
+                    'waterfall' => new HtmlString($html.<<<HTML
                         <script>
                              window.addEventListener('load', () => window.setTimeout(() => {
                                 const linkTemplate = document.createElement('link')
@@ -117,9 +134,8 @@ class ServiceProvider extends BaseServiceProvider
                                 loadNext({$assets}, {$this->prefetchChunks})
                             }))
                         </script>
-                        HTML);
-                } else {
-                    return new HtmlString($html.<<<HTML
+                        HTML),
+                    'aggressive' => new HtmlString($html.<<<HTML
                         <script>
                              window.addEventListener('load', () => window.setTimeout(() => {
                                 const linkTemplate = document.createElement('link')
@@ -140,8 +156,8 @@ class ServiceProvider extends BaseServiceProvider
                                 document.head.append(fragment)
                              }))
                         </script>
-                        HTML);
-                }
+                        HTML),
+                };
             }
         });
     }
