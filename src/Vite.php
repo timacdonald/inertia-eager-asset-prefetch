@@ -1,13 +1,13 @@
 <?php
 
-namespace TiMacDonald\Inertia;
+namespace TiMacDonald\InertiaEagerAssetPrefetch;
 
-use Illuminate\Foundation\Vite;
+use Illuminate\Foundation\Vite as BaseVite;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Js;
 use Stringable;
 
-class EagerPrefetch extends Vite
+class Vite extends BaseVite
 {
     /**
      * The prefetching strategy to use.

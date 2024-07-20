@@ -2,10 +2,8 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Vite as FoundationVite;
 use Illuminate\Support\Facades\Vite;
 use Orchestra\Testbench\TestCase;
-use TiMacDonald\Inertia\EagerPrefetch;
 
 class EagerPrefetchTest extends TestCase
 {

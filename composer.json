@@ -1,5 +1,5 @@
 {
-    "name": "timacdonald/inertia-eager-asset-prefetching",
+    "name": "timacdonald/inertia-eager-asset-prefetch",
     "description": "Eager asset prefetching for Inertia, Laravel, and Vite. ",
     "keywords": [
         "inertia",
@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TiMacDonald\\Inertia\\": "src"
+            "TiMacDonald\\InertiaEagerAssetPrefetch\\": "src"
         }
     },
     "autoload-dev": {
@@ -42,7 +42,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "TiMacDonald\\Inertia\\EagerPrefetchServiceProvider"
+                "TiMacDonald\\InertiaEagerAssetPrefetch\\ServiceProvider"
             ]
         }
     }
