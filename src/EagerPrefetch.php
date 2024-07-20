@@ -91,17 +91,20 @@ class EagerPrefetch extends Vite
 
 
                         const loadNext = (assets, count) => window.setTimeout(() => {
+                            const fragment = new DocumentFragment
+
                             while (count > 0) {
                                 const link = makeLink(assets.shift())
+                                fragment.append(link)
+                                count--
 
                                 if (assets.length) {
                                     link.onload = () => loadNext(assets, 1)
                                     link.error = () => loadNext(assets, 1)
                                 }
-
-                                document.head.append(link)
-                                count--
                             }
+
+                            document.head.append(fragment)
                         })
 
                         loadNext({$assets}, {$this->chunks})
