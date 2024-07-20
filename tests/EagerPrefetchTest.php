@@ -4,9 +4,17 @@ namespace Tests;
 
 use Illuminate\Support\Facades\Vite;
 use Orchestra\Testbench\TestCase;
+use TiMacDonald\InertiaEagerAssetPrefetch\ServiceProvider;
 
 class EagerPrefetchTest extends TestCase
 {
+    protected function getPackageProviders($app) 
+    {
+        return [
+            ServiceProvider::class,
+        ];
+    }
+
     public function testItCanPrefetch()
     {
         app()->usePublicPath(__DIR__);
