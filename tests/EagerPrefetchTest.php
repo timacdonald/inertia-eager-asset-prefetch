@@ -11,7 +11,6 @@ class EagerPrefetchTest extends TestCase
 {
     public function testItCanPrefetch()
     {
-        app()->singleton(FoundationVite::class, EagerPrefetch::class);
         app()->usePublicPath(__DIR__);
 
         $html = (string) Vite::toHtml();
@@ -57,7 +56,6 @@ class EagerPrefetchTest extends TestCase
 
     public function testItCanPrefetchAggressively()
     {
-        app()->singleton(FoundationVite::class, EagerPrefetch::class);
         app()->usePublicPath(__DIR__);
 
         $html = (string) Vite::prefetchStrategy('aggressive')->toHtml();

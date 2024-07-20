@@ -38,5 +38,12 @@
         "sort-packages": true
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TiMacDonald\\Inertia\\EagerPrefetchServiceProvider"
+            ]
+        }
+    }
 }
