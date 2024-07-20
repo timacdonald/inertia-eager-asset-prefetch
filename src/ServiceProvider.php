@@ -20,7 +20,7 @@ class ServiceProvider extends BaseServiceProvider
             protected $prefetchStrategy = 'waterfall';
 
             /**
-             * When using the 'waterfall' strategy, the count of assets to load at one time.
+             * When using the "waterfall" strategy, the count of assets to load at one time.
              *
              * @param int
              */
@@ -71,11 +71,11 @@ class ServiceProvider extends BaseServiceProvider
              */
             public function __invoke($entrypoints, $buildDirectory = null)
             {
-                if ($this->isRunningHot()) {
-                    return parent::__invoke($entrypoints, $buildDirectory);
-                }
+                $base = parent::__invoke($entrypoints, $buildDirectory);
 
-                $html = parent::__invoke($entrypoints, $buildDirectory);
+                if ($this->isRunningHot()) {
+                    return $base;
+                }
 
                 $manifest = $this->manifest($buildDirectory ??= $this->buildDirectory);
 
@@ -93,14 +93,14 @@ class ServiceProvider extends BaseServiceProvider
                         'rel' => 'prefetch',
                         'href' => $url,
                     ])->reject(fn ($value) => in_array($value, [null, false], true))->mapWithKeys(fn ($value, $key) => [
-                        is_int($key) ? $value : $key => $value,
+                        $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
                     ]))
                         ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']]))
                         ->values()
-                        ->pipe(fn ($attributes) => Js::from($attributes)->toHtml());
+                        ->pipe(fn ($attributes) => Js::from($attributes));
 
                 return match ($this->prefetchStrategy) {
-                    'waterfall' => new HtmlString($html.<<<HTML
+                    'waterfall' => new HtmlString($base.<<<HTML
                         <script>
                              window.addEventListener('load', () => window.setTimeout(() => {
                                 const linkTemplate = document.createElement('link')
@@ -137,7 +137,7 @@ class ServiceProvider extends BaseServiceProvider
                             }))
                         </script>
                         HTML),
-                    'aggressive' => new HtmlString($html.<<<HTML
+                    'aggressive' => new HtmlString($base.<<<HTML
                         <script>
                              window.addEventListener('load', () => window.setTimeout(() => {
                                 const linkTemplate = document.createElement('link')
