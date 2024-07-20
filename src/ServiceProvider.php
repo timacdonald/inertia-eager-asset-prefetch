@@ -17,21 +17,28 @@ class ServiceProvider extends BaseServiceProvider
              *
              * @var 'waterfall'|'aggressive'
              */
-            protected string $strategy = 'waterfall';
+            protected $prefetchStrategy = 'waterfall';
 
             /**
              * When using the 'waterfall' strategy, the count of assets to load at one time.
+             *
+             * @param int
              */
-            protected int $chunks = 3;
+            protected $prefetchChunks = 3;
 
             /**
              * Set the prefetching strategy.
              *
              * @param  'waterfall'|'aggressive'  $strategy
+             * @param  ...mixed  $extra
              */
-            public function prefetchStrategy(string $strategy): static
+            public function usePrefetchStrategy(string $strategy, mixed ...$extra): static
             {
-                $this->strategy = $strategy;
+                $this->prefetchStrategy = $strategy;
+
+                if ($strategy === 'waterfall') {
+                    $this->prefetchChunks = $extra[0] ?? 3;
+                }
 
                 return $this;
             }
@@ -50,6 +57,7 @@ class ServiceProvider extends BaseServiceProvider
                 }
 
                 $html = parent::__invoke($entrypoints, $buildDirectory);
+
                 $manifest = $this->manifest($buildDirectory ??= $this->buildDirectory);
 
                 $assets = collect($manifest)
@@ -68,30 +76,26 @@ class ServiceProvider extends BaseServiceProvider
                     ])->reject(fn ($value) => in_array($value, [null, false], true))->mapWithKeys(fn ($value, $key) => [
                         is_int($key) ? $value : $key => $value,
                     ]))
-                    ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']]))
-                    ->values()
-                    ->pipe(fn ($attributes) => Js::from($attributes)->toHtml());
+                        ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']]))
+                        ->values()
+                        ->pipe(fn ($attributes) => Js::from($attributes)->toHtml());
 
-                $html .= <<<HTML
-                    <script>
-                         window.addEventListener('load', () => window.setTimeout(() => {
-                            const linkTemplate = document.createElement('link')
-                            linkTemplate.rel = 'prefetch'
+                if ($this->prefetchStrategy === 'waterfall') {
+                    return new HtmlString($html.<<<HTML
+                        <script>
+                             window.addEventListener('load', () => window.setTimeout(() => {
+                                const linkTemplate = document.createElement('link')
+                                linkTemplate.rel = 'prefetch'
 
-                            const makeLink = (asset) => {
-                                const link = linkTemplate.cloneNode()
+                                const makeLink = (asset) => {
+                                    const link = linkTemplate.cloneNode()
 
-                                Object.keys(asset).forEach((attribute) => {
-                                    link.setAttribute(attribute, asset[attribute])
-                                })
+                                    Object.keys(asset).forEach((attribute) => {
+                                        link.setAttribute(attribute, asset[attribute])
+                                    })
 
-                                return link
-                            }
-                    HTML;
-
-                    if ($this->strategy === 'waterfall') {
-                        $html .= <<<HTML
-
+                                    return link
+                                }
 
                                 const loadNext = (assets, count) => window.setTimeout(() => {
                                     const fragment = new DocumentFragment
@@ -110,26 +114,35 @@ class ServiceProvider extends BaseServiceProvider
                                     document.head.append(fragment)
                                 })
 
-                                loadNext({$assets}, {$this->chunks})
+                                loadNext({$assets}, {$this->prefetchChunks})
                             }))
                         </script>
-                        HTML;
+                        HTML);
+                } else {
+                    return new HtmlString($html.<<<HTML
+                        <script>
+                             window.addEventListener('load', () => window.setTimeout(() => {
+                                const linkTemplate = document.createElement('link')
+                                linkTemplate.rel = 'prefetch'
 
-                        } else {
+                                const makeLink = (asset) => {
+                                    const link = linkTemplate.cloneNode()
 
-                        $html .= <<<JS
+                                    Object.keys(asset).forEach((attribute) => {
+                                        link.setAttribute(attribute, asset[attribute])
+                                    })
 
+                                    return link
+                                }
 
                                 const fragment = new DocumentFragment
                                 {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
                                 document.head.append(fragment)
                              }))
                         </script>
-                        JS;
-                        }
-
-                    return new HtmlString($html);
+                        HTML);
                 }
-            });
+            }
+        });
     }
 }
