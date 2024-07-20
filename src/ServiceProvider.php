@@ -29,7 +29,7 @@ class ServiceProvider extends BaseServiceProvider
             /**
              * Filter the prefetch assets.
              *
-             * @param  callable|null
+             * @param  (callable(array): bool)|null
              */
             protected $prefetchFilter = null;
 
@@ -52,6 +52,8 @@ class ServiceProvider extends BaseServiceProvider
 
             /**
              * Filter the assets to prefetch use the given callback.
+             *
+             * @param  (callable(array): bool)  $callback
              */
             public function usePrefetchFilter(callable $callback): static
             {
@@ -79,7 +81,7 @@ class ServiceProvider extends BaseServiceProvider
 
                 $assets = collect($manifest)
                     ->filter(fn ($chunk) => isset($chunk['file']))
-                    ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
+                    ->filter($this->prefetchFilter ?? fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
                     ->sort(fn ($chunk) => str_ends_with($chunk['file'], '.js'))
                     ->map(fn ($chunk) => collect([
                         ...$this->resolvePreloadTagAttributes(
@@ -157,7 +159,7 @@ class ServiceProvider extends BaseServiceProvider
                              }))
                         </script>
                         HTML),
-                };
+            };
             }
         });
     }
