@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace TiMacDonald\Inertia;
 
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\HtmlString;
