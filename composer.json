@@ -1,12 +1,12 @@
 {
-    "name": "timacdonald/inertia-active-preloading",
-    "description": "Active asset preloading for Inertia, Laravel, and Vite. ",
+    "name": "timacdonald/inertia-eager-asset-prefetching",
+    "description": "Eager asset prefetching for Inertia, Laravel, and Vite. ",
     "keywords": [
         "inertia",
         "inertiajs",
         "laravel",
         "vite",
-        "preloading"
+        "prefetch"
     ],
     "license": "MIT",
     "authors": [
@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TiMacDonald\\InertiaActivePreloading\\": "src"
+            "TiMacDonald\\Inertia\\": "src"
         }
     },
     "autoload-dev": {

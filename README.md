@@ -1,1 +1,1 @@
-# inertia-active-preloading
+# inertia-eager-asset-prefetch
