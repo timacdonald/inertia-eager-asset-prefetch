@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Js;
 use Orchestra\Testbench\TestCase;
 use TiMacDonald\InertiaEagerAssetPrefetch\ServiceProvider;
 
@@ -15,13 +16,34 @@ class EagerPrefetchTest extends TestCase
         ];
     }
 
-    public function testItCanPrefetch()
+    public function testItCanPrefetchEntrypoint()
     {
         app()->usePublicPath(__DIR__);
 
-        $html = (string) Vite::toHtml();
+        $html = (string) Vite::withEntryPoints(['resources/js/app.js'])->toHtml();
 
-        $this->assertSame(<<<'HTML'
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js"],
+        ]);
+        $this->assertSame(<<<HTML
+        <link rel="preload" as="style" href="http://localhost/build/assets/index-B3s1tYeC.css" /><link rel="modulepreload" href="http://localhost/build/assets/app-lliD09ip.js" /><link rel="modulepreload" href="http://localhost/build/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="http://localhost/build/assets/index-B3s1tYeC.css" /><script type="module" src="http://localhost/build/assets/app-lliD09ip.js"></script>
         <script>
              window.addEventListener('load', () => window.setTimeout(() => {
                 const linkTemplate = document.createElement('link')
@@ -54,20 +76,40 @@ class EagerPrefetchTest extends TestCase
                     document.head.append(fragment)
                 })
 
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022}]'), 3)
+                loadNext({$expectedAssets}, 3)
             }))
         </script>
         HTML, $html);
     }
 
-    public function testItUsesDeafultChunksForWaterfall()
+    public function testItUsesDefaultChunksForWaterfall()
     {
         app()->usePublicPath(__DIR__);
 
-        $html = (string) Vite::usePrefetchStrategy('waterfall')->toHtml();
+        $html = (string) Vite::withEntryPoints(['resources/js/app.js'])->usePrefetchStrategy('waterfall')->toHtml();
 
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022}]'), 3)
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js"],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
             JAVASCRIPT, $html);
     }
 
@@ -75,10 +117,30 @@ class EagerPrefetchTest extends TestCase
     {
         app()->usePublicPath(__DIR__);
 
-        $html = (string) Vite::usePrefetchStrategy('waterfall', 10)->toHtml();
+        $html = (string) Vite::withEntryPoints(['resources/js/app.js'])->usePrefetchStrategy('waterfall', 10)->toHtml();
 
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022}]'), 10)
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js"],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 10)
             JAVASCRIPT, $html);
     }
 
@@ -86,9 +148,31 @@ class EagerPrefetchTest extends TestCase
     {
         app()->usePublicPath(__DIR__);
 
-        $html = (string) Vite::usePrefetchStrategy('aggressive')->toHtml();
+        $html = (string) Vite::withEntryPoints(['resources/js/app.js'])->usePrefetchStrategy('aggressive')->toHtml();
 
-        $this->assertSame(<<<'HTML'
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js"],
+        ]);
+
+        $this->assertSame(<<<HTML
+        <link rel="preload" as="style" href="http://localhost/build/assets/index-B3s1tYeC.css" /><link rel="modulepreload" href="http://localhost/build/assets/app-lliD09ip.js" /><link rel="modulepreload" href="http://localhost/build/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="http://localhost/build/assets/index-B3s1tYeC.css" /><script type="module" src="http://localhost/build/assets/app-lliD09ip.js"></script>
         <script>
              window.addEventListener('load', () => window.setTimeout(() => {
                 const linkTemplate = document.createElement('link')
@@ -105,47 +189,41 @@ class EagerPrefetchTest extends TestCase
                 }
 
                 const fragment = new DocumentFragment
-                JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022}]').forEach((asset) => fragment.append(makeLink(asset)))
+                {$expectedAssets}.forEach((asset) => fragment.append(makeLink(asset)))
                 document.head.append(fragment)
              }))
         </script>
         HTML, $html);
     }
 
-    public function testItCanFilterPrefetchAssets()
-    {
-        app()->usePublicPath(__DIR__);
-
-        $html = (string) Vite::usePrefetchFilter(function ($chunk) {
-            return $chunk['isDynamicEntry'] ?? false;
-        })->toHtml();
-
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022}]'), 3)
-        JAVASCRIPT, $html);
-    }
-
-    public function testItDoesNotPrefetchPreloadedAssets()
-    {
-        app()->usePublicPath(__DIR__);
-
-        $html = (string) Vite::withEntryPoints(['views/foo.js'])->toHtml();
-
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022}]'), 3)
-        JAVASCRIPT, $html);
-    }
-
     public function testAddsAttributesToPrefetchTags()
     {
         app()->usePublicPath(__DIR__);
 
-        Vite::useCspNonce('abc123');
+        $html = (string) tap(Vite::withEntryPoints(['resources/js/app.js']))->useCspNonce('abc123')->toHtml();
 
-        $html = (string) Vite::toHtml();
-
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022,\u0022nonce\u0022:\u0022abc123\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022,\u0022nonce\u0022:\u0022abc123\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022,\u0022nonce\u0022:\u0022abc123\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022,\u0022nonce\u0022:\u0022abc123\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022,\u0022nonce\u0022:\u0022abc123\u0022}]'), 3)
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js", "nonce" => "abc123"],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
         JAVASCRIPT, $html);
     }
 
@@ -153,18 +231,37 @@ class EagerPrefetchTest extends TestCase
     {
         app()->usePublicPath(__DIR__);
 
-        Vite::usePreloadTagAttributes([
+        $html = (string) tap(Vite::withEntryPoints(['resources/js/app.js']))->usePreloadTagAttributes([
             'key' => 'value',
             'key-only',
             'true-value' => true,
             'false-value' => false,
             'null-value' => null,
+        ])->toHtml();
+
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
         ]);
 
-        $html = (string) Vite::toHtml();
-
-        $this->assertStringContainsString(<<<'JAVASCRIPT'
-                loadNext(JSON.parse('[{\u0022rel\u0022:\u0022prefetch\u0022,\u0022as\u0022:\u0022style\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-ChJ_j-JJ.css\u0022,\u0022key\u0022:\u0022value\u0022,\u0022key-only\u0022:\u0022key-only\u0022,\u0022true-value\u0022:\u0022true-value\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/foo-BRBmoGS9.js\u0022,\u0022key\u0022:\u0022value\u0022,\u0022key-only\u0022:\u0022key-only\u0022,\u0022true-value\u0022:\u0022true-value\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/bar-gkvgaI9m.js\u0022,\u0022key\u0022:\u0022value\u0022,\u0022key-only\u0022:\u0022key-only\u0022,\u0022true-value\u0022:\u0022true-value\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/baz-B2H3sXNv.js\u0022,\u0022key\u0022:\u0022value\u0022,\u0022key-only\u0022:\u0022key-only\u0022,\u0022true-value\u0022:\u0022true-value\u0022},{\u0022rel\u0022:\u0022prefetch\u0022,\u0022href\u0022:\u0022http:\\\/\\\/localhost\\\/build\\\/assets\\\/shared-B7PI925R.js\u0022,\u0022key\u0022:\u0022value\u0022,\u0022key-only\u0022:\u0022key-only\u0022,\u0022true-value\u0022:\u0022true-value\u0022}]'), 3)
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
         JAVASCRIPT, $html);
     }
 }
