@@ -64,10 +64,16 @@ class ServiceProvider extends BaseServiceProvider
                         ->map(fn ($import) => $manifest[$import])
                         ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
                         ->flatMap($resolveImportChunks = function ($chunk) use (&$resolveImportChunks, $manifest) {
-                            return array_reduce($chunk['imports'] ?? [], fn ($chunks, $import) => [
-                                ...$chunks,
-                                ...$resolveImportChunks($manifest[$import]),
-                            ], [$chunk]);
+                            return collect([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []])
+                                ->reduce(
+                                    fn ($chunks, $import) => $chunks->merge(
+                                        $resolveImportChunks($manifest[$import])
+                                    ), collect([$chunk]))
+                                ->merge(collect($chunk['css'] ?? [])->map(
+                                    fn ($css) => collect($manifest)->first(fn ($chunk) => $chunk['file'] === $css) ?? [
+                                        'file' => $css,
+                                    ],
+                                ));
                         })
                         ->map(function ($chunk) use ($buildDirectory, $manifest) {
                             return collect([
