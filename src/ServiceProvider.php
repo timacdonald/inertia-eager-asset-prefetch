@@ -72,9 +72,7 @@ class ServiceProvider extends BaseServiceProvider
                                         return true;
                                     }
 
-                                    $discoveredImports[$import] = true;
-
-                                    return false;
+                                    return ! $discoveredImports[$import] = true;
                                 })
                                 ->reduce(
                                     fn ($chunks, $import) => $chunks->merge(
