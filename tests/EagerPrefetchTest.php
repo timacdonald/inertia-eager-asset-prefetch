@@ -25,10 +25,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
@@ -91,12 +91,37 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Dashboard-DM_LxQy2.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/AuthenticatedLayout-DfWF52N1.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Edit-CYV2sXpe.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/DeleteUserForm-B1oHFaVP.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdatePasswordForm-CaeWqGla.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/UpdateProfileInformationForm-CJwkYwQQ.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/Welcome-D_7l79PQ.js"],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
+            JAVASCRIPT, $html);
+    }
+
+    public function testItHandlesSpecifyingPageWithAppJs()
+    {
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) Vite::withEntryPoints(['resources/js/app.js', 'resources/js/Pages/Auth/Login.vue'])->usePrefetchStrategy('waterfall')->toHtml();
+
+        $expectedAssets = Js::from([
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ResetPassword-BNl7a4X1.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/VerifyEmail-CyukB_SZ.js"],
@@ -122,10 +147,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
@@ -153,10 +178,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
@@ -205,10 +230,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js", "nonce" => "abc123"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "nonce" => "abc123"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "nonce" => "abc123"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js", "nonce" => "abc123"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js", "nonce" => "abc123"],
@@ -242,10 +267,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js", "key" => "value", "key-only" => "key-only", "true-value" => "true-value"],
@@ -274,10 +299,10 @@ class EagerPrefetchTest extends TestCase
         $expectedAssets = Js::from([
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ConfirmPassword-CDwcgU8E.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/GuestLayout-BY3LC-73.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
-            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/TextInput-C8CCB_U_.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/PrimaryButton-DuXwr-9M.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/ApplicationLogo-BhIZH06z.js"],
+            ["rel" => "prefetch", "href" => "http://localhost/build/assets/_plugin-vue_export-helper-DlAUqK2U.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/ForgotPassword-B0WWE0BO.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Login-DAFSdGSW.js"],
             ["rel" => "prefetch", "href" => "http://localhost/build/assets/Register-CfYQbTlA.js"],
@@ -332,6 +357,5 @@ class EagerPrefetchTest extends TestCase
             }))
         </script>
         HTML, $html);
-
     }
 }
