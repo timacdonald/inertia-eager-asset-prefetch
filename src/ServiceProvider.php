@@ -122,6 +122,14 @@ class ServiceProvider extends BaseServiceProvider
                                     }
 
                                     const loadNext = (assets, count) => window.setTimeout(() => {
+                                        if (count > assets.length) {
+                                            count = assets.length
+
+                                            if (count === 0) {
+                                                return
+                                            }
+                                        }
+
                                         const fragment = new DocumentFragment
 
                                         while (count > 0) {
